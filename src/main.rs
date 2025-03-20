@@ -1,3 +1,3 @@
 fn main() {
-    api::start()
+    api::start().expect("Failed to start server");
 }

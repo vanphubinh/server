@@ -1,17 +1,24 @@
 use std::net::SocketAddr;
 
+use anyhow::Result;
 use axum::{routing::get, Router};
 use config::Config;
+use migration::MigratorTrait;
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use tokio::signal;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[tokio::main]
-pub async fn start() {
+pub async fn start() -> Result<()> {
     // Initialize configuration
     let config = Config::load().expect("Failed to load configuration");
 
     // Initialize tracing
     setup_tracing(&config);
+
+    // Connect to the database
+    let db = setup_database(&config).await?;
 
     // Build the application router
     let app = Router::new().route("/", get(|| async { "Hello, World!" }));
@@ -20,7 +27,12 @@ pub async fn start() {
     let listener = tokio::net::TcpListener::bind(&address).await.unwrap();
 
     info!("Server listening on {}", listener.local_addr().unwrap());
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
+
+    info!("Server shutdown completed");
+    Ok(())
 }
 
 fn setup_tracing(config: &Config) {
@@ -33,4 +45,57 @@ fn setup_tracing(config: &Config) {
         .init();
 
     info!("Tracing initialized");
+}
+
+async fn setup_database(config: &Config) -> Result<DatabaseConnection> {
+    let db_url = &config.database.url;
+
+    // Create connection options
+    let mut opt = ConnectOptions::new(db_url.to_owned());
+
+    // Enable SQL query logging only in development mode
+    if cfg!(debug_assertions) {
+        opt.sqlx_logging(true);
+    } else {
+        opt.sqlx_logging(false);
+    }
+
+    let db = Database::connect(opt).await?;
+
+    // Run migrations if enabled
+    if config.database.run_migrations {
+        info!("Running database migrations");
+        migration::Migrator::up(&db, None).await?;
+    }
+
+    info!("Database connection established");
+    Ok(db)
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("Failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("Failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {
+            info!("Received Ctrl+C, starting graceful shutdown");
+        },
+        _ = terminate => {
+            info!("Received terminate signal, starting graceful shutdown");
+        },
+    }
 }
