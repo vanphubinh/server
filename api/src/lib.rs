@@ -8,6 +8,9 @@ use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use tokio::signal;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use utils::AppState;
+
+mod routes;
 
 #[tokio::main]
 pub async fn start() -> Result<()> {
@@ -20,8 +23,14 @@ pub async fn start() -> Result<()> {
     // Connect to the database
     let db = setup_database(&config).await?;
 
+    // Create app state
+    let state = AppState::new(db).into_shared();
+
     // Build the application router
-    let app = Router::new().route("/", get(|| async { "Hello, World!" }));
+    let app = Router::new()
+        .route("/", get(|| async { "Hello, World!" }))
+        .nest("/api", routes::api_router())
+        .with_state(state);
 
     let address = SocketAddr::from(([0, 0, 0, 0, 0, 0, 0, 0], config.server.port));
     let listener = tokio::net::TcpListener::bind(&address).await.unwrap();

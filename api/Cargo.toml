@@ -7,6 +7,7 @@ edition = "2021"
 # Local dependencies
 config = { version = "0.1.0", path = "../config" }
 utils = { version = "0.1.0", path = "../utils" }
+measurement = { version = "0.1.0", path = "../context/measurement" }
 
 # Web framework and middleware
 axum = { workspace = true }

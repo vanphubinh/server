@@ -17,3 +17,6 @@ tracing = { workspace = true }
 # Serialization
 serde = { workspace = true }
 serde_json = { workspace = true }
+
+# Database
+sea-orm = { workspace = true }

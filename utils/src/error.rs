@@ -89,42 +89,22 @@ impl IntoResponse for AppError {
     }
 }
 
+// Implementation of From for common error types
 impl From<anyhow::Error> for AppError {
     fn from(err: anyhow::Error) -> Self {
-        // Log the full error with details and backtrace if available
-        tracing::error!(?err, "Converting anyhow error to AppError");
-
-        // Default to internal server error
         AppError::Internal(err.to_string())
     }
 }
 
-// Common conversion traits for standard library errors
+impl From<sea_orm::DbErr> for AppError {
+    fn from(err: sea_orm::DbErr) -> Self {
+        AppError::Database(err.to_string())
+    }
+}
+
 impl From<std::io::Error> for AppError {
     fn from(err: std::io::Error) -> Self {
-        tracing::error!(?err, "IO error occurred");
         AppError::Internal(format!("IO error: {}", err))
-    }
-}
-
-impl From<serde_json::Error> for AppError {
-    fn from(err: serde_json::Error) -> Self {
-        tracing::error!(?err, "JSON serialization error");
-        AppError::InvalidInput(format!("Invalid JSON: {}", err))
-    }
-}
-
-// Extension trait to simplify Result mapping
-pub trait ResultExt<T, E> {
-    fn map_err_to_app(self, f: impl FnOnce(E) -> String) -> Result<T>;
-}
-
-impl<T, E: std::fmt::Debug> ResultExt<T, E> for std::result::Result<T, E> {
-    fn map_err_to_app(self, f: impl FnOnce(E) -> String) -> Result<T> {
-        self.map_err(|e| {
-            tracing::error!(?e, "Error converted to AppError");
-            AppError::Internal(f(e))
-        })
     }
 }
 
