@@ -6,7 +6,7 @@ use sea_orm::{
 use utils::{PaginatedResponse, PaginationParams};
 use uuid::Uuid;
 
-use crate::domain::uom::{ActiveModel, Column, CreateUomInput, Entity as UomEntity, UomResponse};
+use crate::domain::uom::{ActiveModel, Column, CreateUomInput, Entity as UomEntity, UomDto};
 pub struct UomService {
     db: DatabaseConnection,
 }
@@ -17,10 +17,7 @@ impl UomService {
     }
 
     // Get all UOMs with pagination
-    pub async fn find_all(
-        &self,
-        params: PaginationParams,
-    ) -> Result<PaginatedResponse<UomResponse>> {
+    pub async fn find_all(&self, params: PaginationParams) -> Result<PaginatedResponse<UomDto>> {
         let page = params.page.unwrap_or(1);
         let per_page = params.per_page.unwrap_or(10);
 
@@ -38,31 +35,31 @@ impl UomService {
         let models = paginator.fetch_page(page - 1).await?;
 
         // Convert models to response type
-        let data = models.into_iter().map(UomResponse::from).collect();
+        let data = models.into_iter().map(UomDto::from).collect();
 
         Ok(PaginatedResponse::new(data, total, page, per_page))
     }
 
     // Get UOM by ID
-    pub async fn find_by_id(&self, id: Uuid) -> Result<Option<UomResponse>> {
+    pub async fn find_by_id(&self, id: Uuid) -> Result<Option<UomDto>> {
         let uom = UomEntity::find_by_id(id).one(&self.db).await?;
-        Ok(uom.map(UomResponse::from))
+        Ok(uom.map(UomDto::from))
     }
 
     // Create a new UOM
-    pub async fn create(&self, input: CreateUomInput) -> Result<UomResponse> {
+    pub async fn create(&self, input: CreateUomInput) -> Result<UomDto> {
         // Convert to ActiveModel
         let uom = ActiveModel {
             id: Set(Uuid::new_v4()),
             name: Set(input.name),
-            created_at: Set(Utc::now().into()),
+            created_at: Set(Utc::now()),
             updated_at: Set(None),
             ..Default::default()
         };
 
         // Let the ActiveModelBehavior handle the UUID and timestamps
         let model = uom.insert(&self.db).await?;
-        Ok(UomResponse::from(model))
+        Ok(UomDto::from(model))
     }
 
     // Delete a UOM by ID

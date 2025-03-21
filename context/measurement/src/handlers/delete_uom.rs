@@ -1,20 +1,23 @@
 use axum::{extract::Path, extract::State, http::StatusCode};
-use serde::Deserialize;
 use utils::{no_content, ApiResponse, AppError, SharedState};
 use uuid::Uuid;
 
 use crate::service::UomService;
 
-/// Delete UOM request (uses path param)
-#[derive(Debug, Deserialize)]
-pub struct DeleteUomRequest {
-    pub id: Uuid,
-}
-
-/// Delete UOM has no response body (204 No Content)
-pub type DeleteUomResponse = ();
-
 /// Delete a UOM by ID
+#[utoipa::path(
+    delete,
+    path = "/uoms/delete_uom/{id}",
+    params(
+        ("id" = Uuid, Path, description = "The unique identifier of the UOM to delete")
+    ),
+    responses(
+        (status = 204, description = "UOM successfully deleted"),
+        (status = 404, description = "UOM not found"),
+        (status = 500, description = "Internal server error")
+    ),
+    tag = "Measurement"
+)]
 #[axum::debug_handler]
 pub async fn delete_uom(
     State(state): State<SharedState>,

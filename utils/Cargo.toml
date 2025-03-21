@@ -20,3 +20,7 @@ serde_json = { workspace = true }
 
 # Database
 sea-orm = { workspace = true }
+
+# OpenAPI
+utoipa = { workspace = true }
+uuid = { workspace = true }

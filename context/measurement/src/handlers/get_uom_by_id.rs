@@ -3,7 +3,7 @@ use serde::Deserialize;
 use utils::{ApiResponse, AppError, SharedState};
 use uuid::Uuid;
 
-use crate::{domain::uom::UomResponse, service::UomService};
+use crate::{domain::uom::UomDto, service::UomService};
 
 /// Get UOM by ID request (uses path param)
 #[derive(Debug, Deserialize)]
@@ -12,9 +12,22 @@ pub struct GetUomByIdRequest {
 }
 
 /// Get UOM by ID response
-pub type GetUomByIdResponse = UomResponse;
+pub type GetUomByIdResponse = UomDto;
 
 /// Get a UOM by ID
+#[utoipa::path(
+    get,
+    path = "/uoms/get_uom_by_id/{id}",
+    params(
+        ("id" = Uuid, Path, description = "The unique identifier of the UOM to retrieve")
+    ),
+    responses(
+        (status = 200, description = "UOM found", body = UomDto),
+        (status = 404, description = "UOM not found"),
+        (status = 500, description = "Internal server error")
+    ),
+    tag = "Measurement"
+)]
 #[axum::debug_handler]
 pub async fn get_uom_by_id(
     State(state): State<SharedState>,

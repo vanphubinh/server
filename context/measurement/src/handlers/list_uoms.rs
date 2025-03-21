@@ -1,15 +1,28 @@
 use axum::{extract::Query, extract::State, Json};
 use utils::{ApiResponse, PaginatedResponse, PaginationParams, SharedState};
 
-use crate::{domain::uom::UomResponse, service::UomService};
+use crate::{domain::uom::UomDto, service::UomService};
 
 /// List UOMs request (uses pagination params from query)
 pub type ListUomsRequest = PaginationParams;
 
 /// List UOMs response
-pub type ListUomsResponse = PaginatedResponse<UomResponse>;
+pub type ListUomsResponse = PaginatedResponse<UomDto>;
 
 /// List all UOMs with pagination
+#[utoipa::path(
+    get,
+    path = "/uoms/list_uoms",
+    params(
+        ("page" = Option<u64>, Query, description = "Page number for pagination"),
+        ("page_size" = Option<u64>, Query, description = "Number of items per page")
+    ),
+    responses(
+        (status = 200, response = inline(PaginatedResponse<UomDto>)),
+        (status = 500, description = "Internal server error")
+    ),
+    tag = "Measurement"
+)]
 #[axum::debug_handler]
 pub async fn list_uoms(
     State(state): State<SharedState>,

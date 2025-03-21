@@ -4,6 +4,8 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
+use utoipa::{ToResponse, ToSchema};
+use uuid::Uuid;
 
 use crate::AppError;
 
@@ -18,6 +20,18 @@ pub struct ApiError {
 pub struct ApiSuccess<T> {
     pub data: T,
     pub message: Option<String>,
+}
+
+/// Standard response for create operations that returns only the UUID
+#[derive(Debug, Serialize, Deserialize, ToSchema, ToResponse)]
+pub struct CreateResponse {
+    pub id: Uuid,
+}
+
+impl CreateResponse {
+    pub fn new(id: Uuid) -> Self {
+        Self { id }
+    }
 }
 
 /// Helper functions for standard API responses

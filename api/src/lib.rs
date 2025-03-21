@@ -9,11 +9,29 @@ use tokio::signal;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use utils::AppState;
+use utoipa::OpenApi;
+use utoipa_scalar::{Scalar, Servable};
+use utoipauto::utoipauto;
 
 mod routes;
 
 #[tokio::main]
 pub async fn start() -> Result<()> {
+    /// Generate the OpenAPI documentation for the API
+    #[utoipauto(paths = "./utils/src from utils, ./context/measurement/src from measurement")]
+    #[derive(OpenApi)]
+    #[openapi(info(
+        title = "Van Phu Binh API",
+        version = "1.0.0",
+        description = "API for managing Van Phu Binh Internal System"
+    ))]
+    pub struct ApiDoc;
+
+    /// Serve the OpenAPI specification in JSON format
+    pub async fn serve_openapi() -> impl axum::response::IntoResponse {
+        axum::Json(ApiDoc::openapi())
+    }
+
     // Initialize configuration
     let config = Config::load().expect("Failed to load configuration");
 
@@ -28,8 +46,9 @@ pub async fn start() -> Result<()> {
 
     // Build the application router
     let app = Router::new()
-        .route("/", get(|| async { "Hello, World!" }))
-        .nest("/api", routes::api_router())
+        .route("/openapi.json", get(serve_openapi))
+        .merge(Scalar::with_url("/docs", ApiDoc::openapi()))
+        .merge(routes::api_router())
         .with_state(state);
 
     let address = SocketAddr::from(([0, 0, 0, 0, 0, 0, 0, 0], config.server.port));
