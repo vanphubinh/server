@@ -6,7 +6,7 @@ use crate::service::UomService;
 
 /// Delete a UOM by ID
 #[utoipa::path(
-    delete,
+    post,
     path = "/uoms/delete_uom/{id}",
     params(
         ("id" = Uuid, Path, description = "The unique identifier of the UOM to delete")
