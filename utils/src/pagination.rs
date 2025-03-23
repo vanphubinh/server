@@ -21,14 +21,27 @@ impl Default for PaginationParams {
 #[derive(Debug, Serialize, ToSchema, ToResponse)]
 pub struct PaginatedResponse<T: ToSchema> {
     pub data: Vec<T>,
+    pub meta: PaginationMeta,
+}
+
+#[derive(Debug, Serialize, ToSchema, ToResponse)]
+pub struct PaginationMeta {
     pub total: u64,
     pub page: u64,
+    #[serde(rename = "perPage")]
     pub per_page: u64,
+    #[serde(rename = "totalPages")]
     pub total_pages: u64,
 }
 
 impl<T: ToSchema> PaginatedResponse<T> {
-    pub fn new(data: Vec<T>, total: u64, page: u64, per_page: u64) -> Self {
+    pub fn new(data: Vec<T>, meta: PaginationMeta) -> Self {
+        Self { data, meta }
+    }
+}
+
+impl PaginationMeta {
+    pub fn new(total: u64, page: u64, per_page: u64) -> Self {
         let total_pages = if total > 0 {
             (total + per_page - 1) / per_page
         } else {
@@ -36,7 +49,6 @@ impl<T: ToSchema> PaginatedResponse<T> {
         };
 
         Self {
-            data,
             total,
             page,
             per_page,

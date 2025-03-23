@@ -3,7 +3,7 @@ use chrono::Utc;
 use sea_orm::{
     ActiveModelTrait, ActiveValue::Set, DatabaseConnection, EntityTrait, PaginatorTrait, QueryOrder,
 };
-use utils::{PaginatedResponse, PaginationParams};
+use utils::{PaginatedResponse, PaginationMeta, PaginationParams};
 use uuid::Uuid;
 
 use crate::domain::uom::{ActiveModel, Column, CreateUomInput, Entity as UomEntity, UomDto};
@@ -37,7 +37,10 @@ impl UomService {
         // Convert models to response type
         let data = models.into_iter().map(UomDto::from).collect();
 
-        Ok(PaginatedResponse::new(data, total, page, per_page))
+        Ok(PaginatedResponse::new(
+            data,
+            PaginationMeta::new(total, page, per_page),
+        ))
     }
 
     // Get UOM by ID
