@@ -3,11 +3,14 @@ use axum::{
     Router,
 };
 use measurement::handlers::{create_uom, delete_uom, get_uom_by_id, list_uoms};
+use product::handlers::{create_category, delete_category, get_category_by_id, list_categories};
 use utils::SharedState;
 
 /// Create the main API router
 pub fn api_router() -> Router<SharedState> {
-    Router::new().nest("/uoms", uom_router())
+    Router::new()
+        .nest("/uoms", uom_router())
+        .nest("/categories", category_router())
     // Add more context routers here as needed
 }
 
@@ -18,4 +21,13 @@ fn uom_router() -> Router<SharedState> {
         .route("/create_uom", post(create_uom))
         .route("/get_uom_by_id/{id}", get(get_uom_by_id))
         .route("/delete_uom/{id}", post(delete_uom))
+}
+
+/// Create a router for category operations
+fn category_router() -> Router<SharedState> {
+    Router::new()
+        .route("/list_categories", get(list_categories))
+        .route("/create_category", post(create_category))
+        .route("/get_category_by_id/{id}", get(get_category_by_id))
+        .route("/delete_category/{id}", post(delete_category))
 }

@@ -129,6 +129,7 @@ dependencies = [
  "config",
  "measurement",
  "migration",
+ "product",
  "sea-orm",
  "tokio",
  "tower",
@@ -1899,6 +1900,22 @@ dependencies = [
  "syn 2.0.100",
  "version_check",
  "yansi",
+]
+
+[[package]]
+name = "product"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "chrono",
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.12",
+ "utils",
+ "utoipa",
+ "uuid",
 ]
 
 [[package]]

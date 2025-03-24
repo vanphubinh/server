@@ -18,7 +18,9 @@ mod routes;
 #[tokio::main]
 pub async fn start() -> Result<()> {
     /// Generate the OpenAPI documentation for the API
-    #[utoipauto(paths = "./utils/src from utils, ./context/measurement/src from measurement")]
+    #[utoipauto(
+        paths = "./utils/src from utils, ./context/measurement/src from measurement, ./context/product/src from product"
+    )]
     #[derive(OpenApi)]
     #[openapi(info(
         title = "Van Phu Binh API",

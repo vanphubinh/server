@@ -8,7 +8,7 @@ edition = "2021"
 config = { version = "0.1.0", path = "../config" }
 utils = { version = "0.1.0", path = "../utils" }
 measurement = { version = "0.1.0", path = "../context/measurement" }
-
+product = { version = "0.1.0", path = "../context/product" }
 # Web framework and middleware
 axum = { workspace = true }
 tower = { workspace = true }

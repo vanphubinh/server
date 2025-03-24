@@ -21,7 +21,9 @@ pub type ListUomsResponse = PaginatedResponse<UomDto>;
         (status = 200, response = inline(PaginatedResponse<UomDto>)),
         (status = 500, description = "Internal server error")
     ),
-    tag = "Measurement"
+    tag = "Measurement",
+    summary = "Get all UOMs with pagination",
+    description = "Get a paginated list of all UOMs"
 )]
 #[axum::debug_handler]
 pub async fn list_uoms(
