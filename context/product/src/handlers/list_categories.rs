@@ -19,7 +19,7 @@ pub type ListCategoriesResponse = PaginatedResponse<CategoryDto>;
     path = "/categories/list_categories",
     params(
         ("page" = Option<i32>, Query, description = "Page number"),
-        ("per_page" = Option<i32>, Query, description = "Items per page"),
+        ("page_size" = Option<i32>, Query, description = "Items per page"),
     ),
     responses(
         (status = 200, response = inline(PaginatedResponse<CategoryDto>)),
