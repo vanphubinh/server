@@ -2,6 +2,8 @@ pub use sea_orm_migration::prelude::*;
 
 mod m20250320_132610_create_uom_table;
 mod m20250324_125055_create_category_table;
+mod m20250329_092600_create_product_template_table;
+mod m20250329_093335_create_product_table;
 
 pub struct Migrator;
 
@@ -11,6 +13,8 @@ impl MigratorTrait for Migrator {
         vec![
             Box::new(m20250320_132610_create_uom_table::Migration),
             Box::new(m20250324_125055_create_category_table::Migration),
+            Box::new(m20250329_092600_create_product_template_table::Migration),
+            Box::new(m20250329_093335_create_product_table::Migration),
         ]
     }
 }

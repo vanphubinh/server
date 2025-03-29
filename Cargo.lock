@@ -1909,6 +1909,7 @@ dependencies = [
  "anyhow",
  "axum",
  "chrono",
+ "measurement",
  "sea-orm",
  "serde",
  "serde_json",
