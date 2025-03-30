@@ -59,7 +59,7 @@ impl AppError {
 
     /// Helper to create a not found error with custom message
     pub fn not_found(resource: &str) -> Self {
-        AppError::NotFound(format!("Resource not found: {}", resource))
+        AppError::NotFound(resource.to_string())
     }
 
     /// Helper to create an invalid input error
