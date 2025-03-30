@@ -53,7 +53,7 @@ impl UomService {
     pub async fn create(&self, input: CreateUomInput) -> Result<UomDto> {
         // Convert to ActiveModel
         let uom = ActiveModel {
-            id: Set(Uuid::new_v4()),
+            id: Set(Uuid::now_v7()),
             name: Set(input.name),
             created_at: Set(Utc::now()),
             updated_at: Set(None),

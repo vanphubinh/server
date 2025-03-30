@@ -59,7 +59,6 @@ impl CatalogService {
     pub async fn create(&self, input: CreateCategoryInput) -> Result<CategoryDto> {
         // Convert to ActiveModel
         let category = ActiveModel {
-            id: Set(Uuid::new_v4()),
             name: Set(input.name),
             parent_category_id: Set(input.parent_category_id),
             created_at: Set(Utc::now()),

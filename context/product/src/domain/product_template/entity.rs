@@ -60,7 +60,7 @@ impl Related<crate::domain::product::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {
     fn new() -> Self {
         Self {
-            id: Set(Uuid::new_v4()),
+            id: Set(Uuid::now_v7()),
             ..ActiveModelTrait::default()
         }
     }

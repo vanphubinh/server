@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use sea_orm::prelude::Decimal;
 use serde::{Deserialize, Serialize};
 use utoipa::{ToResponse, ToSchema};
 use uuid::Uuid;
@@ -11,14 +12,9 @@ use super::entity::Model;
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateProductInput {
-    pub name: String,
-    pub description: String,
-    pub product_type: ProductType,
-    pub product_subtype: ProductSubtype,
-    pub uom_id: Uuid,
-    pub category_id: Option<Uuid>,
-    pub price: f64,
-    pub cost: f64,
+    pub product_template_id: Uuid,
+    pub price: Decimal,
+    pub cost: Decimal,
 }
 
 /// Response type for a single product
