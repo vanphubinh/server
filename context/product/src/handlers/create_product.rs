@@ -65,9 +65,7 @@ pub async fn create_product(
     State(state): State<SharedState>,
     Json(req): Json<CreateProductRequest>,
 ) -> Result<(StatusCode, Json<CreateProductResponse>), AppError> {
-    println!("Creating product: {:?}", req);
-    // Use the transaction helper to manage commit/rollback
-    let product = state
+    state
         .db
         .transaction::<_, ProductDto, AppError>(|txn| {
             Box::pin(async move {
@@ -106,11 +104,12 @@ pub async fn create_product(
                 Ok(product)
             })
         })
-        .await?; // Await the result and use ? for automatic error conversion
-
-    // If the transaction was successful, return the created response
-    Ok((
-        StatusCode::CREATED,
-        Json(CreateProductResponse { id: product.id }),
-    ))
+        .await
+        .map_err(AppError::from) // Await the result and use ? for automatic error conversion
+        .map(|product| {
+            (
+                StatusCode::CREATED,
+                Json(CreateProductResponse { id: product.id }),
+            )
+        })
 }
