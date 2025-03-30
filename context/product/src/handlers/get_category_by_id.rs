@@ -33,9 +33,11 @@ pub async fn get_category_by_id(
     State(state): State<SharedState>,
     Path(id): Path<Uuid>,
 ) -> ApiResponse<Json<GetCategoryByIdResponse>> {
-    let service = CatalogService::new(state.db.clone());
+    // Instantiate without db
+    let service = CatalogService::new();
 
-    match service.find_by_id(id).await {
+    // Pass db reference to the method
+    match service.find_by_id(&state.db, id).await {
         Ok(Some(category)) => Ok(Json(category)),
         Ok(None) => Err(AppError::not_found("Category")),
         Err(err) => Err(AppError::from(err)),

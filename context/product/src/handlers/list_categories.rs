@@ -34,10 +34,10 @@ pub async fn list_categories(
     State(state): State<SharedState>,
     Query(req): Query<ListCategoriesRequest>,
 ) -> ApiResponse<Json<ListCategoriesResponse>> {
-    let service = CatalogService::new(state.db.clone());
+    let service = CatalogService::new();
 
     service
-        .find_all(req)
+        .find_all(&state.db, req)
         .await
         .map(Json)
         .map_err(utils::AppError::from)

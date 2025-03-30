@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
 use utils::{created, ApiResponse, AppError, CreateResponse, SharedState};
 
-use crate::{domain::category::CreateCategoryInput, service::catalog_service::CatalogService};
+use crate::service::catalog_service::{CatalogService, CreateCategoryInput};
 
 /// Create category request
 pub type CreateCategoryRequest = CreateCategoryInput;
@@ -28,10 +28,10 @@ pub async fn create_category(
     State(state): State<SharedState>,
     Json(req): Json<CreateCategoryRequest>,
 ) -> ApiResponse<(StatusCode, Json<CreateCategoryResponse>)> {
-    let service = CatalogService::new(state.db.clone());
+    let service = CatalogService::new();
 
     service
-        .create(req)
+        .create(&state.db, req)
         .await
         .map(|category| created(CreateCategoryResponse { id: category.id }))
         .map_err(AppError::from)

@@ -31,8 +31,10 @@ pub struct CreateProductRequest {
     #[serde(rename = "uomId")]
     pub uom_id: Uuid,
     /// Product price
+    #[schema(example = "1.0")]
     pub price: Decimal,
     /// Product cost
+    #[schema(example = "1.0")]
     pub cost: Decimal,
     /// Optional category ID
     #[serde(rename = "categoryId")]
@@ -56,8 +58,8 @@ pub type CreateProductResponse = CreateResponse;
         (status = 500),
     ),
     tag = "Product",
-    summary = "Create a new product with template",
-    description = "Create a new product template and product in a single transaction"
+    summary = "Create a new product",
+    description = "Create a new product with payload containing product name, type, subtype, uom, price, cost, category, and description"
 )]
 pub async fn create_product(
     State(state): State<SharedState>,

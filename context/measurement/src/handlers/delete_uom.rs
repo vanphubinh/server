@@ -2,7 +2,7 @@ use axum::{extract::Path, extract::State, http::StatusCode};
 use utils::{no_content, ApiResponse, AppError, SharedState};
 use uuid::Uuid;
 
-use crate::service::UomService;
+use crate::service::uom_service::UomService;
 
 /// Delete a UOM by ID
 #[utoipa::path(
@@ -23,9 +23,9 @@ pub async fn delete_uom(
     State(state): State<SharedState>,
     Path(id): Path<Uuid>,
 ) -> ApiResponse<StatusCode> {
-    let service = UomService::new(state.db.clone());
+    let service = UomService::new();
 
-    match service.delete(id).await {
+    match service.delete(&state.db, id).await {
         Ok(true) => Ok(no_content()),
         Ok(false) => Err(AppError::not_found("UOM")),
         Err(err) => Err(AppError::from(err)),

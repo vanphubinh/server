@@ -1,7 +1,7 @@
 use axum::{extract::Query, extract::State, Json};
 use utils::{ApiResponse, PaginatedResponse, PaginationParams, SharedState};
 
-use crate::{domain::uom::UomDto, service::UomService};
+use crate::{domain::uom::UomDto, service::uom_service::UomService};
 
 /// List UOMs request (uses pagination params from query)
 pub type ListUomsRequest = PaginationParams;
@@ -30,10 +30,10 @@ pub async fn list_uoms(
     State(state): State<SharedState>,
     Query(req): Query<ListUomsRequest>,
 ) -> ApiResponse<Json<ListUomsResponse>> {
-    let service = UomService::new(state.db.clone());
+    let service = UomService::new();
 
     service
-        .find_all(req)
+        .find_all(&state.db, req)
         .await
         .map(Json)
         .map_err(utils::AppError::from)

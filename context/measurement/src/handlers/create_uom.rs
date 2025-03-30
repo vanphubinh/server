@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
 use utils::{created, ApiResponse, AppError, CreateResponse, SharedState};
 
-use crate::{domain::uom::CreateUomInput, service::UomService};
+use crate::service::uom_service::{CreateUomInput, UomService};
 
 /// Create UOM request
 pub type CreateUomRequest = CreateUomInput;
@@ -28,10 +28,10 @@ pub async fn create_uom(
     State(state): State<SharedState>,
     Json(req): Json<CreateUomRequest>,
 ) -> ApiResponse<(StatusCode, Json<CreateUomResponse>)> {
-    let service = UomService::new(state.db.clone());
+    let service = UomService::new();
 
     service
-        .create(req)
+        .create(&state.db, req)
         .await
         .map(|uom| created(CreateUomResponse { id: uom.id }))
         .map_err(AppError::from)

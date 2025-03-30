@@ -28,9 +28,9 @@ pub async fn delete_category(
     State(state): State<SharedState>,
     Path(id): Path<Uuid>,
 ) -> ApiResponse<StatusCode> {
-    let service = CatalogService::new(state.db.clone());
+    let service = CatalogService::new();
 
-    match service.delete(id).await {
+    match service.delete(&state.db, id).await {
         Ok(true) => Ok(no_content()),
         Ok(false) => Err(AppError::not_found("Category")),
         Err(err) => Err(AppError::from(err)),

@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::{ToResponse, ToSchema};
 use uuid::Uuid;
@@ -29,8 +28,6 @@ pub struct ProductTemplateDto {
     pub product_subtype: ProductSubtype,
     pub description: String,
     pub category_id: Option<Uuid>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: Option<DateTime<Utc>>,
 }
 
 impl From<Model> for ProductTemplateDto {
@@ -43,8 +40,6 @@ impl From<Model> for ProductTemplateDto {
             description: model.description,
             product_type: model.product_type,
             category_id: model.category_id,
-            created_at: model.created_at.to_utc(),
-            updated_at: model.updated_at.map(|dt| dt.to_utc()),
         }
     }
 }

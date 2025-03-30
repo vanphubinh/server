@@ -1,40 +1,46 @@
 use anyhow::Result;
-use chrono::Utc;
 use sea_orm::{
-    ActiveModelTrait, ActiveValue::Set, DatabaseConnection, EntityTrait, PaginatorTrait, QueryOrder,
+    ActiveModelTrait, ActiveValue::Set, ConnectionTrait, EntityTrait, PaginatorTrait, QueryOrder,
 };
+use serde::Deserialize;
 use utils::{PaginatedResponse, PaginationMeta, PaginationParams};
+use utoipa::ToSchema;
 use uuid::Uuid;
 
-use crate::domain::uom::{ActiveModel, Column, CreateUomInput, Entity as UomEntity, UomDto};
-pub struct UomService {
-    db: DatabaseConnection,
+use crate::domain::uom::{ActiveModel, Column, Entity as UomEntity, UomDto};
+
+// Define CreateUomInput here
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct CreateUomInput {
+    pub name: String,
 }
 
+// Remove db field
+pub struct UomService;
+
 impl UomService {
-    pub fn new(db: DatabaseConnection) -> Self {
-        Self { db }
+    // Remove db parameter from new
+    pub fn new() -> Self {
+        Self {}
     }
 
-    // Get all UOMs with pagination
-    pub async fn find_all(&self, params: PaginationParams) -> Result<PaginatedResponse<UomDto>> {
+    // Add db parameter: db: &C where C: ConnectionTrait
+    pub async fn find_all<C>(
+        &self,
+        db: &C,
+        params: PaginationParams,
+    ) -> Result<PaginatedResponse<UomDto>>
+    where
+        C: ConnectionTrait,
+    {
         let page = params.page.unwrap_or(1);
         let per_page = params.per_page.unwrap_or(10);
 
-        // Create the base query
         let mut query = UomEntity::find();
-
-        // Apply ordering (newest first)
         query = query.order_by_desc(Column::CreatedAt);
-
-        // Get total count
-        let total = query.clone().count(&self.db).await?;
-
-        // Apply pagination
-        let paginator = query.paginate(&self.db, per_page);
+        let total = query.clone().count(db).await?; // Use passed db
+        let paginator = query.paginate(db, per_page); // Use passed db
         let models = paginator.fetch_page(page - 1).await?;
-
-        // Convert models to response type
         let data = models.into_iter().map(UomDto::from).collect();
 
         Ok(PaginatedResponse::new(
@@ -43,31 +49,36 @@ impl UomService {
         ))
     }
 
-    // Get UOM by ID
-    pub async fn find_by_id(&self, id: Uuid) -> Result<Option<UomDto>> {
-        let uom = UomEntity::find_by_id(id).one(&self.db).await?;
+    // Add db parameter: db: &C where C: ConnectionTrait
+    pub async fn find_by_id<C>(&self, db: &C, id: Uuid) -> Result<Option<UomDto>>
+    where
+        C: ConnectionTrait,
+    {
+        let uom = UomEntity::find_by_id(id).one(db).await?; // Use passed db
         Ok(uom.map(UomDto::from))
     }
 
-    // Create a new UOM
-    pub async fn create(&self, input: CreateUomInput) -> Result<UomDto> {
-        // Convert to ActiveModel
+    // Add db parameter: db: &C where C: ConnectionTrait
+    pub async fn create<C>(&self, db: &C, input: CreateUomInput) -> Result<UomDto>
+    where
+        C: ConnectionTrait,
+    {
         let uom = ActiveModel {
-            id: Set(Uuid::now_v7()),
             name: Set(input.name),
-            created_at: Set(Utc::now()),
-            updated_at: Set(None),
+            // Assuming Uuid and timestamps are handled by ActiveModelBehavior
             ..Default::default()
         };
 
-        // Let the ActiveModelBehavior handle the UUID and timestamps
-        let model = uom.insert(&self.db).await?;
+        let model = uom.insert(db).await?; // Use passed db
         Ok(UomDto::from(model))
     }
 
-    // Delete a UOM by ID
-    pub async fn delete(&self, id: Uuid) -> Result<bool> {
-        let result = UomEntity::delete_by_id(id).exec(&self.db).await?;
+    // Add db parameter: db: &C where C: ConnectionTrait
+    pub async fn delete<C>(&self, db: &C, id: Uuid) -> Result<bool>
+    where
+        C: ConnectionTrait,
+    {
+        let result = UomEntity::delete_by_id(id).exec(db).await?; // Use passed db
         Ok(result.rows_affected > 0)
     }
 }

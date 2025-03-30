@@ -3,7 +3,7 @@ use serde::Deserialize;
 use utils::{ApiResponse, AppError, SharedState};
 use uuid::Uuid;
 
-use crate::{domain::uom::UomDto, service::UomService};
+use crate::{domain::uom::UomDto, service::uom_service::UomService};
 
 /// Get UOM by ID request (uses path param)
 #[derive(Debug, Deserialize)]
@@ -33,9 +33,9 @@ pub async fn get_uom_by_id(
     State(state): State<SharedState>,
     Path(id): Path<Uuid>,
 ) -> ApiResponse<Json<GetUomByIdResponse>> {
-    let service = UomService::new(state.db.clone());
+    let service = UomService::new();
 
-    match service.find_by_id(id).await {
+    match service.find_by_id(&state.db, id).await {
         Ok(Some(uom)) => Ok(Json(uom)),
         Ok(None) => Err(AppError::not_found("UOM")),
         Err(err) => Err(AppError::from(err)),
