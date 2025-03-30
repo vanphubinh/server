@@ -1,10 +1,8 @@
 use anyhow::Result;
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, ConnectionTrait, TransactionTrait};
+use sea_orm::{prelude::Decimal, ActiveModelTrait, ActiveValue::Set, ConnectionTrait};
+use uuid::Uuid;
 
-use crate::domain::product::{
-    dto::{CreateProductInput, ProductDto},
-    entity::ActiveModel,
-};
+use crate::domain::product::{dto::ProductDto, entity::ActiveModel};
 
 pub struct ProductService;
 
@@ -28,4 +26,10 @@ impl ProductService {
 
         Ok(product.into())
     }
+}
+
+pub struct CreateProductInput {
+    pub product_template_id: Uuid,
+    pub price: Decimal,
+    pub cost: Decimal,
 }

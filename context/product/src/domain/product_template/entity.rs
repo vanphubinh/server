@@ -9,8 +9,10 @@ use uuid::Uuid;
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "product_type")]
 pub enum ProductType {
     #[sea_orm(string_value = "goods")]
+    #[serde(rename = "goods")]
     Goods,
     #[sea_orm(string_value = "service")]
+    #[serde(rename = "service")]
     Service,
 }
 
@@ -18,10 +20,13 @@ pub enum ProductType {
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "product_subtype")]
 pub enum ProductSubtype {
     #[sea_orm(string_value = "standard")]
+    #[serde(rename = "standard")]
     Standard,
     #[sea_orm(string_value = "to_print_packaging")]
+    #[serde(rename = "to_print_packaging")]
     ToPrintPackaging,
     #[sea_orm(string_value = "printing_mould")]
+    #[serde(rename = "printing_mould")]
     PrintingMould,
 }
 

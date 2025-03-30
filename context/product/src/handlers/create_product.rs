@@ -1,32 +1,41 @@
 use axum::{extract::State, http::StatusCode, Json};
-use sea_orm::{prelude::Decimal, DatabaseTransaction, DbErr, TransactionTrait};
+use sea_orm::{prelude::Decimal, TransactionTrait};
 use serde::Deserialize;
-use utils::{created, ApiResponse, AppError, CreateResponse, SharedState};
+use utils::{AppError, CreateResponse, SharedState};
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::{
-    domain::product::dto::CreateProductInput,
-    service::{product_service::ProductService, product_template_service::ProductTemplateService},
-    CreateProductTemplateInput, ProductSubtype, ProductType,
+    product::ProductDto,
+    product_template::ProductSubtype,
+    product_template::ProductType,
+    service::{
+        product_service::{CreateProductInput, ProductService},
+        product_template_service::{CreateProductTemplateInput, ProductTemplateService},
+    },
 };
 
-/// Create product request containing all required fields
-#[derive(Debug, Deserialize, utoipa::ToSchema)]
+/// Create product request containing all requred fields
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateProductRequest {
     /// Product name
     pub name: String,
     /// Product type
+    #[serde(rename = "productType")]
     pub product_type: ProductType,
     /// Product subtype
+    #[serde(rename = "productSubtype")]
     pub product_subtype: ProductSubtype,
     /// Unit of measure ID
+    #[serde(rename = "uomId")]
     pub uom_id: Uuid,
     /// Product price
     pub price: Decimal,
     /// Product cost
     pub cost: Decimal,
     /// Optional category ID
+    #[serde(rename = "categoryId")]
     pub category_id: Option<Uuid>,
     /// Optional description
     pub description: Option<String>,
@@ -54,10 +63,11 @@ pub async fn create_product(
     State(state): State<SharedState>,
     Json(req): Json<CreateProductRequest>,
 ) -> Result<(StatusCode, Json<CreateProductResponse>), AppError> {
+    println!("Creating product: {:?}", req);
     // Use the transaction helper to manage commit/rollback
     let product = state
         .db
-        .transaction::<_, _, AppError>(|txn| {
+        .transaction::<_, ProductDto, AppError>(|txn| {
             Box::pin(async move {
                 // Instantiate services without the transaction connection `txn`
                 let product_service = ProductService::new();
@@ -94,7 +104,7 @@ pub async fn create_product(
                 Ok(product)
             })
         })
-        .await?; // Await the result of the transaction
+        .await?; // Await the result and use ? for automatic error conversion
 
     // If the transaction was successful, return the created response
     Ok((

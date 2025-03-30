@@ -1,21 +1,9 @@
 use chrono::{DateTime, Utc};
-use sea_orm::prelude::Decimal;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use utoipa::{ToResponse, ToSchema};
 use uuid::Uuid;
 
-use crate::{ProductSubtype, ProductType};
-
 use super::entity::Model;
-
-/// Input type for creating a new product
-#[derive(Debug, Deserialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateProductInput {
-    pub product_template_id: Uuid,
-    pub price: Decimal,
-    pub cost: Decimal,
-}
 
 /// Response type for a single product
 #[derive(Debug, Serialize, ToSchema, ToResponse)]

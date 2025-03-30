@@ -4,7 +4,7 @@ use utoipa::{ToResponse, ToSchema};
 use uuid::Uuid;
 
 use super::entity::Model;
-use crate::{ProductSubtype, ProductType};
+use crate::product_template::{ProductSubtype, ProductType};
 
 /// Input type for creating a new product template
 #[derive(Debug, Deserialize, ToSchema)]

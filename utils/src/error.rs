@@ -102,6 +102,21 @@ impl From<sea_orm::DbErr> for AppError {
     }
 }
 
+impl From<sea_orm::TransactionError<AppError>> for AppError {
+    fn from(err: sea_orm::TransactionError<AppError>) -> Self {
+        match err {
+            sea_orm::TransactionError::Connection(db_err) => {
+                // Convert the underlying DbErr
+                AppError::from(db_err)
+            }
+            sea_orm::TransactionError::Transaction(app_err) => {
+                // The error from the transaction closure is already an AppError
+                app_err
+            }
+        }
+    }
+}
+
 impl From<std::io::Error> for AppError {
     fn from(err: std::io::Error) -> Self {
         AppError::Internal(format!("IO error: {}", err))
