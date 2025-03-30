@@ -1,6 +1,6 @@
 use axum::{
-    extract::{Path, State},
-    http::StatusCode,
+  extract::{Path, State},
+  http::StatusCode,
 };
 use utils::{no_content, ApiResponse, AppError, SharedState};
 use uuid::Uuid;
@@ -25,15 +25,15 @@ use crate::service::catalog_service::CatalogService;
     description = "Delete a category by its ID"
 )]
 pub async fn delete_category(
-    State(state): State<SharedState>,
-    Path(id): Path<Uuid>,
+  State(state): State<SharedState>,
+  Path(id): Path<Uuid>,
 ) -> ApiResponse<StatusCode> {
-    let service = CatalogService::new();
+  let service = CatalogService::new();
 
-    match service.delete(&state.db, id).await {
-        Ok(true) => Ok(no_content()),
-        Ok(false) => Err(AppError::not_found("Category")),
-        Err(err) => Err(AppError::from(err)),
-    }
-    .into()
+  match service.delete(&state.db, id).await {
+    Ok(true) => Ok(no_content()),
+    Ok(false) => Err(AppError::not_found("Category")),
+    Err(err) => Err(AppError::from(err)),
+  }
+  .into()
 }

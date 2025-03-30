@@ -20,15 +20,15 @@ use crate::service::uom_service::UomService;
 )]
 #[axum::debug_handler]
 pub async fn delete_uom(
-    State(state): State<SharedState>,
-    Path(id): Path<Uuid>,
+  State(state): State<SharedState>,
+  Path(id): Path<Uuid>,
 ) -> ApiResponse<StatusCode> {
-    let service = UomService::new();
+  let service = UomService::new();
 
-    match service.delete(&state.db, id).await {
-        Ok(true) => Ok(no_content()),
-        Ok(false) => Err(AppError::not_found("UOM")),
-        Err(err) => Err(AppError::from(err)),
-    }
-    .into()
+  match service.delete(&state.db, id).await {
+    Ok(true) => Ok(no_content()),
+    Ok(false) => Err(AppError::not_found("UOM")),
+    Err(err) => Err(AppError::from(err)),
+  }
+  .into()
 }

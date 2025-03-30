@@ -3,16 +3,16 @@ use serde::Deserialize;
 use utils::{ApiResponse, AppError, SharedState};
 use uuid::Uuid;
 
-use crate::{domain::uom::UomDto, service::uom_service::UomService};
+use crate::{domain::uom::dto::Uom, service::uom_service::UomService};
 
 /// Get UOM by ID request (uses path param)
 #[derive(Debug, Deserialize)]
 pub struct GetUomByIdRequest {
-    pub id: Uuid,
+  pub id: Uuid,
 }
 
 /// Get UOM by ID response
-pub type GetUomByIdResponse = UomDto;
+pub type GetUomByIdResponse = Uom;
 
 /// Get a UOM by ID
 #[utoipa::path(
@@ -22,7 +22,7 @@ pub type GetUomByIdResponse = UomDto;
         ("id" = Uuid, Path, description = "The unique identifier of the UOM to retrieve")
     ),
     responses(
-        (status = 200, description = "UOM found", body = UomDto),
+        (status = 200, description = "UOM found", body = Uom),
         (status = 404, description = "UOM not found"),
         (status = 500, description = "Internal server error")
     ),
@@ -30,15 +30,15 @@ pub type GetUomByIdResponse = UomDto;
 )]
 #[axum::debug_handler]
 pub async fn get_uom_by_id(
-    State(state): State<SharedState>,
-    Path(id): Path<Uuid>,
+  State(state): State<SharedState>,
+  Path(id): Path<Uuid>,
 ) -> ApiResponse<Json<GetUomByIdResponse>> {
-    let service = UomService::new();
+  let service = UomService::new();
 
-    match service.find_by_id(&state.db, id).await {
-        Ok(Some(uom)) => Ok(Json(uom)),
-        Ok(None) => Err(AppError::not_found("UOM")),
-        Err(err) => Err(AppError::from(err)),
-    }
-    .into()
+  match service.find_by_id(&state.db, id).await {
+    Ok(Some(uom)) => Ok(Json(uom)),
+    Ok(None) => Err(AppError::not_found("UOM")),
+    Err(err) => Err(AppError::from(err)),
+  }
+  .into()
 }

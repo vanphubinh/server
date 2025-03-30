@@ -1,13 +1,13 @@
 use axum::{extract::Query, extract::State, Json};
 use utils::{ApiResponse, PaginatedResponse, PaginationParams, SharedState};
 
-use crate::{domain::uom::UomDto, service::uom_service::UomService};
+use crate::{domain::uom::dto::Uom, service::uom_service::UomService};
 
 /// List UOMs request (uses pagination params from query)
 pub type ListUomsRequest = PaginationParams;
 
 /// List UOMs response
-pub type ListUomsResponse = PaginatedResponse<UomDto>;
+pub type ListUomsResponse = PaginatedResponse<Uom>;
 
 /// List all UOMs with pagination
 #[utoipa::path(
@@ -18,7 +18,7 @@ pub type ListUomsResponse = PaginatedResponse<UomDto>;
         ("page_size" = Option<u64>, Query, description = "Number of items per page")
     ),
     responses(
-        (status = 200, response = inline(PaginatedResponse<UomDto>)),
+        (status = 200, response = inline(PaginatedResponse<Uom>)),
         (status = 500, description = "Internal server error")
     ),
     tag = "Measurement",
@@ -27,15 +27,15 @@ pub type ListUomsResponse = PaginatedResponse<UomDto>;
 )]
 #[axum::debug_handler]
 pub async fn list_uoms(
-    State(state): State<SharedState>,
-    Query(req): Query<ListUomsRequest>,
+  State(state): State<SharedState>,
+  Query(req): Query<ListUomsRequest>,
 ) -> ApiResponse<Json<ListUomsResponse>> {
-    let service = UomService::new();
+  let service = UomService::new();
 
-    service
-        .find_all(&state.db, req)
-        .await
-        .map(Json)
-        .map_err(utils::AppError::from)
-        .into()
+  service
+    .find_all(&state.db, req)
+    .await
+    .map(Json)
+    .map_err(utils::AppError::from)
+    .into()
 }

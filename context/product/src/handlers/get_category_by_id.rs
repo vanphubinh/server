@@ -3,16 +3,16 @@ use serde::Deserialize;
 use utils::{ApiResponse, AppError, SharedState};
 use uuid::Uuid;
 
-use crate::{domain::category::CategoryDto, service::catalog_service::CatalogService};
+use crate::{domain::category::dto::Category, service::catalog_service::CatalogService};
 
 /// Get category by ID request (uses path param)
 #[derive(Debug, Deserialize)]
 pub struct GetCategoryByIdRequest {
-    pub id: Uuid,
+  pub id: Uuid,
 }
 
 /// Get category by ID response
-pub type GetCategoryByIdResponse = CategoryDto;
+pub type GetCategoryByIdResponse = Category;
 
 /// Get a category by ID
 #[utoipa::path(
@@ -22,7 +22,7 @@ pub type GetCategoryByIdResponse = CategoryDto;
         ("id" = Uuid, Path, description = "The unique identifier of the category to retrieve")
     ),
     responses(
-        (status = 200, description = "Category found", body = CategoryDto),
+        (status = 200, description = "Category found", body = Category),
         (status = 404, description = "Category not found"),
         (status = 500, description = "Internal server error")
     ),
@@ -30,17 +30,17 @@ pub type GetCategoryByIdResponse = CategoryDto;
 )]
 #[axum::debug_handler]
 pub async fn get_category_by_id(
-    State(state): State<SharedState>,
-    Path(id): Path<Uuid>,
+  State(state): State<SharedState>,
+  Path(id): Path<Uuid>,
 ) -> ApiResponse<Json<GetCategoryByIdResponse>> {
-    // Instantiate without db
-    let service = CatalogService::new();
+  // Instantiate without db
+  let service = CatalogService::new();
 
-    // Pass db reference to the method
-    match service.find_by_id(&state.db, id).await {
-        Ok(Some(category)) => Ok(Json(category)),
-        Ok(None) => Err(AppError::not_found("Category")),
-        Err(err) => Err(AppError::from(err)),
-    }
-    .into()
+  // Pass db reference to the method
+  match service.find_by_id(&state.db, id).await {
+    Ok(Some(category)) => Ok(Json(category)),
+    Ok(None) => Err(AppError::not_found("Category")),
+    Err(err) => Err(AppError::from(err)),
+  }
+  .into()
 }

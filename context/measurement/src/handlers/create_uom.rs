@@ -25,15 +25,15 @@ pub type CreateUomResponse = CreateResponse;
     description = "Create a new UOM with the given name"
 )]
 pub async fn create_uom(
-    State(state): State<SharedState>,
-    Json(req): Json<CreateUomRequest>,
+  State(state): State<SharedState>,
+  Json(req): Json<CreateUomRequest>,
 ) -> ApiResponse<(StatusCode, Json<CreateUomResponse>)> {
-    let service = UomService::new();
+  let service = UomService::new();
 
-    service
-        .create(&state.db, req)
-        .await
-        .map(|uom| created(CreateUomResponse { id: uom.id }))
-        .map_err(AppError::from)
-        .into()
+  service
+    .create(&state.db, req)
+    .await
+    .map(|uom| created(CreateUomResponse { id: uom.id }))
+    .map_err(AppError::from)
+    .into()
 }
