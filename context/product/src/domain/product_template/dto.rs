@@ -1,5 +1,5 @@
 use sea_orm::{DerivePartialModel, FromQueryResult, ModelTrait};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use utoipa::{ToResponse, ToSchema};
 use uuid::Uuid;
 

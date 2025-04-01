@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::{ToResponse, ToSchema};
 
 /// Pagination request parameters
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Deserialize, ToSchema, utoipa::IntoParams)]
 pub struct PaginationParams {
   pub page: Option<u64>,
   pub per_page: Option<u64>,

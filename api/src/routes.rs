@@ -5,6 +5,7 @@ use axum::{
 use measurement::handlers::{create_uom, delete_uom, get_uom_by_id, list_uoms};
 use product::handlers::{
   create_category, create_product, delete_category, get_category_by_id, list_categories,
+  list_products,
 };
 use utils::SharedState;
 
@@ -37,5 +38,7 @@ fn category_router() -> Router<SharedState> {
 
 /// Create a router for product operations
 fn product_router() -> Router<SharedState> {
-  Router::new().route("/create_product", post(create_product))
+  Router::new()
+    .route("/create_product", post(create_product))
+    .route("/list_products", get(list_products))
 }

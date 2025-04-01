@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::{
-  domain::product::dto::Product,
+  domain::product::entity::Model as ProductModel,
   product_template::ProductSubtype,
   product_template::ProductType,
   service::{
@@ -67,7 +67,7 @@ pub async fn create_product(
 ) -> Result<(StatusCode, Json<CreateProductResponse>), AppError> {
   state
     .db
-    .transaction::<_, Product, AppError>(|txn| {
+    .transaction::<_, ProductModel, AppError>(|txn| {
       Box::pin(async move {
         // Instantiate services without the transaction connection `txn`
         let product_service = ProductService::new();
