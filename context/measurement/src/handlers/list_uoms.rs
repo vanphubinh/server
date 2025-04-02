@@ -15,7 +15,7 @@ pub type ListUomsResponse = PaginatedResponse<Uom>;
     path = "/uoms/list_uoms",
     params(
         ("page" = Option<u64>, Query, description = "Page number for pagination"),
-        ("page_size" = Option<u64>, Query, description = "Number of items per page")
+        ("per_page" = Option<u64>, Query, description = "Number of items per page")
     ),
     responses(
         (status = 200, response = inline(PaginatedResponse<Uom>)),

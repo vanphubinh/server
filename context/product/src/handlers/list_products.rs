@@ -18,8 +18,8 @@ pub type ListProductsResponse = PaginatedResponse<Product>;
     get,
     path = "/products/list_products",
     params(
-        ("page" = Option<u64>, Query, description = "Page number for pagination"),
-        ("per_page" = Option<u64>, Query, description = "Number of items per page")
+      ("page" = Option<u64>, Query, description = "Page number"),
+      ("per_page" = Option<u64>, Query, description = "Items per page"),
     ),
     responses(
         (status = 200, response = inline(PaginatedResponse<Product>)),

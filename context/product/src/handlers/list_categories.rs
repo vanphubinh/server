@@ -18,8 +18,8 @@ pub type ListCategoriesResponse = PaginatedResponse<Category>;
     get,
     path = "/categories/list_categories",
     params(
-        ("page" = Option<i32>, Query, description = "Page number"),
-        ("page_size" = Option<i32>, Query, description = "Items per page"),
+        ("page" = Option<u64>, Query, description = "Page number"),
+        ("per_page" = Option<u64>, Query, description = "Items per page"),
     ),
     responses(
         (status = 200, response = inline(PaginatedResponse<Category>)),
