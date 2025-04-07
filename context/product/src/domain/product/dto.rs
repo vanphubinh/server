@@ -1,5 +1,5 @@
 use measurement::uom::dto::Uom;
-use sea_orm::{prelude::Decimal, DerivePartialModel, FromQueryResult, ModelTrait};
+use sea_orm::{prelude::Decimal, FromQueryResult};
 use serde::Serialize;
 use utoipa::{ToResponse, ToSchema};
 use uuid::Uuid;
